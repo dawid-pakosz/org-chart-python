@@ -128,19 +128,20 @@
     <!----------------  ORG CHART ESSENTIAL CONTENT ---------------->
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="./build/d3-org-chart.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@2.6.0"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@2.6.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.0.0/build/d3-flextree.js"></script>
     <div class="chart-container" style=" padding-top:10px;  height:1200px ;background-color:white"> </div>
 
     <script>
         var index = 0;
         var chart;
-        d3.csv('misc/data.csv')
-            .then(dataFlattened => {
+
+        function initChart(dataFlattened) {
                 chart = new d3.OrgChart()
                     .container('.chart-container')
                     .data(dataFlattened)
-                    .scaleExtent([1,1])
+                    .scaleExtent([1, 1])
                     // .svgHeight(window.innerHeight)
                     // .nodeWidth((d3Node) => {
                     //     return 200;
@@ -229,7 +230,7 @@
 
                     .nodeContent(function (d, i, arr, state) {
                         const color = "#FFFFFF"
-                        console.log({data:d})
+                        console.log({ data: d })
                         return `
                          <div style="font-family: 'Inter', sans-serif;background-color:${color}; position:absolute;margin-top:-1px; margin-left:-1px;width:${d.width}px;height:${d.height}px;border-radius:10px;border: 1px solid #E4E2E9">
                             <div style="background-color:${color};position:absolute;margin-top:-25px;margin-left:${15}px;border-radius:100px;width:50px;height:50px;" ></div>
@@ -250,8 +251,20 @@
 
 
 
-                    .render()
-            })
+                    .render();
+        }
+
+        window.addEventListener('pywebviewready', function() {
+            window.pywebview.api.get_data().then(data => {
+                initChart(data);
+            });
+        });
+
+        setTimeout(() => {
+            if (!window.pywebview && !chart) {
+                d3.csv('misc/data.csv').then(data => initChart(data));
+            }
+        }, 2000);
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
